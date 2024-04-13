@@ -7,6 +7,7 @@ This project is a basic backend implementation to interact with a fyer's API for
 * Place sell order: Execute a sell order for a specified stock.(/sell inside first.py)
 * Receive postback from the broker: Handle postbacks received from the broker after order execution.(/sell inside first.py)
 * Get real-time prices via websocket: Subscribe to real-time price updates for specified stocks using websockets.(/subscribe inside first.py)
+* Adding real time Web Sockets Data into the Database which can be used for backtesting.
 
 ## Technologies Used
 Python: A Programming Language
