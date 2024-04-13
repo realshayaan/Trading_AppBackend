@@ -2,10 +2,18 @@ from flask import Flask, request
 from fyers_apiv3 import fyersModel
 from fyers_apiv3.FyersWebsocket import data_ws,order_ws
 from flask_cors import CORS
+import sqlite3
+import time
 app = Flask(__name__)
+
 client_id = "XC4XXXXM-100"
+
 access_token = "eyJ0eXXXXXXXX2c5-Y3RgS8wR14g"
+
 fyers = fyersModel.FyersModel(client_id=client_id, token=access_token,is_async=False, log_path="")
+
+db = sqlite3.connect('realtime.db',check_same_thread=False)
+c= db.cursor
 
 CORS(app, resources={
     r"/buy": {"origins": "*"},
@@ -13,6 +21,8 @@ CORS(app, resources={
     r"/sell": {"origins": "*"},
     r"/holdings": {"origins": "*"}
 })
+
+
 @app.route("/holdings", methods=["GET"])
 def holdings():
     response = fyers.holdings()
@@ -26,9 +36,9 @@ def buy():
     elif type1 == "Market_Order":
         type1 = 2
     elif type1 == "Stop_Order":
-        type1 == 3
+        type1 = 3
     elif type1 == "StopLimit_Order":
-        type1 == 4
+        type1 = 4
 
     data =  {
     "symbol": request.form.get('symbol'),
@@ -55,14 +65,14 @@ def sell():
     elif type1 == "Market_Order":
         type1 = 2
     elif type1 == "Stop_Order":
-        type1 == 3
+        type1 = 3
     elif type1 == "StopLimit_Order":
-        type1 == 4
+        type1 = 4
     data = {
     "symbol": request.form.get('symbol'),
     "qty": int(request.form.get('qty')),
     "type": int(type1),
-    "side": 1, # 1 for buy order
+    "side": -1, # -1 for sell order
     "productType": "INTRADAY",
     "limitPrice": 0,
     "stopPrice": 0,
@@ -73,6 +83,11 @@ def sell():
     }
     response = fyers.place_order(data)
     return response
+
+@app.route("/fetch_and_store",methods = ["POST"])
+def store():
+    ws.connect()
+    
 
 @app.route("/subscribe", methods=["GET"])
 def subscribe():
@@ -85,6 +100,7 @@ def onopen():
     
     # Subscribe to the specified symbols and data type
     symbols = ["NSE:NIFTY50-INDEX" , "NSE:NIFTYBANK-INDEX"]
+    
     ws.subscribe(symbols=symbols, data_type=data_type)
 
     # Keep the socket running to receive real-time data
@@ -112,7 +128,35 @@ ws = data_ws.FyersDataSocket(
     on_error=onerror,
     on_message=onmessage,
 )
+def create_table(tokens):
+    for i in tokens:
+        print(i) 
+        c.execute("CREATE TABLE IF NOT EXISTS {} (ts datetime primary key, price real(15,5), volume integer)".format(i))
+    try:
+        db.commit()
+    except:
+        db.rollback()
 
+def insert_ticks(msg):
+    print("start")
+    for tick in msg:
+        try:
+            ltp = tick['ltp']
+            high = tick['high_price']
+            vol = tick['vol_traded_today']
+            ltt = time.strftime('%Y-%m-%d-%H:%M:%S',time.localtime(tick['timestamp']))
+            tok = str(tick['symbol'][4:])
+            data = (ltt,ltp,vol)
+            c.execute(f"INSERT INTO {tok} VALUES {data};")
+        except Exception as e:
+            pass
+    try: 
+        db.commit()
+    except:
+        db.rollback()
+
+def on_ticks(msg):
+    insert_ticks(msg)
 
 if __name__ == "__main__":
     app.run(debug=True)
