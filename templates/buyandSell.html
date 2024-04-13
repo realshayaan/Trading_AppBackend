@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Buy Stock</title>
+  </head>
+  <body>
+    <form action = "http://127.0.0.1:5000/buy" method = "POST">
+    <h1>Buy Stock</h1>
+    <label for="symbol">Symbol:</label><br>
+    <input type="text" id="symbol" name="symbol" value="NSE:IDEA-EQ"><br>
+    <label for="qty">Qty:</label><br>
+    <input type="number" id="qty" name="qty" value="1"><br>
+    <label for="type">Symbol:</label><br>
+    <input type="text" id = "type" name = "type" value="Market_Order"><br>
+    <input type="submit" value="Buy"></form>
+    <form action = "http://127.0.0.1:5000/sell" method = "POST">
+      <h1>Sell Stock</h1>
+      <label for="symbol">Symbol:</label><br>
+    <input type="text" id="symbol" name="symbol" value="NSE:IDEA-EQ"><br>
+    <label for="qty">Qty:</label><br>
+    <input type="number" id="qty" name="qty" value="1"><br>
+    <label for="type">Symbol:</label><br>
+    <input type="text" id = "type" name = "type" value="Market_Order"><br>
+    <input type="submit" value="Sell">
+    </form>
+    
+   
+    <div id="response"></div>
+    
+    
+    <!-- <script>
+      // const data = {
+      //   symbol: "NSE:IDEA-EQ",
+      //   qty: 1,
+      //   type: 2,
+      //   side: 1,
+      //   productType: "INTRADAY",
+      //   limitPrice: 0,
+      //   stopPrice: 0,
+      //   validity: "DAY",
+      //   disclosedQty: 0,
+      //   offlineOrder: false,
+      //   orderTag: "tag1"
+      // };
+
+      const buyButton = document.getElementById("buy-button");
+      const responseDiv = document.getElementById("response");
+      const sellButton = document.getElementById("sell-button");
+      buyButton.addEventListener("click", async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:5000/buy", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            // body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            throw new Error("Error placing order");
+          }
+
+          const jsonResponse = await response.json();
+          responseDiv.textContent = `Buy Order placed successfully: ${JSON.stringify(jsonResponse)}`;
+        } catch (error) {
+          responseDiv.textContent = `Error placing order: ${error.message}`;
+        }
+      });
+      sellButton.addEventListener("click", async () => {
+        try {
+          const response = await fetch("http://127.0.0.1:5000/sell", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            // body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            throw new Error("Error placing order");
+          }
+
+          const jsonResponse = await response.json();
+          responseDiv.textContent = `Sell Order placed successfully: ${JSON.stringify(jsonResponse)}`;
+        } catch (error) {
+          responseDiv.textContent = `Error placing order: ${error.message}`;
+        }
+      });
+    </script> -->
+  </body>
+</html>
