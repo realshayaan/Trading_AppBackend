@@ -84,6 +84,14 @@ def sell():
     response = fyers.place_order(data)
     return response
 
+@app.route('/postbacks',methods = ["GET"])
+def postback():
+    data = {
+    "symbols":"NSE:SBIN-EQ,NSE:HDFC-EQ"
+    }
+    response = fyers.quotes(data=data)
+    return response
+
 @app.route("/fetch_and_store",methods = ["POST"])
 def store():
     ws.connect()
